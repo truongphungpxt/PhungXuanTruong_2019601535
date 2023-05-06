@@ -1,0 +1,190 @@
+﻿@using SNKRS.Models
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - SNKRS</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <link rel="stylesheet" href="https://cdn.reflowhq.com/v1/toolkit.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    @RenderSection("styles", required: false)
+    <style>
+        .api {
+            background-color: blueviolet;
+            height: 30px;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            column-gap: 20px;   
+        }
+    </style>
+</head>
+<body>
+    <marquee id="api" class="api">
+       
+    </marquee>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+
+        <div class="container">
+            <a class="navbar-brand" href="@Url.Action("Index", "Home")">ShopShoes</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="@Url.Action("Index", "Home")">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Index", "Shop")">Shop</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Index", "Tracking")">Order Tracking</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Index", "Cart")"><i class="fa-solid fa-cart-shopping"></i> Cart <span id="cart-amount" class="badge bg-secondary"></span></a>
+                        </li>
+                        @Html.Partial("_LoginPartial")
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main>
+        @RenderBody()
+    </main>
+    <footer class="footer-dark">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6 col-md-3 item">
+                    <h3>Services</h3>
+                    <ul>
+                        <li><a href="#">Web design</a></li>
+                        <li><a href="#">Development</a></li>
+                        <li><a href="#">Hosting</a></li>
+                    </ul>
+                </div>
+                <div class="col-sm-6 col-md-3 item">
+                    <h3>About</h3>
+                    <ul>
+                        <li><a href="#">Company</a></li>
+                        <li><a href="#">Team</a></li>
+                        <li><a href="#">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-6 item text">
+                    <h3>ShopShoes</h3>
+                    <p>Praesent sed lobortis mi. Suspendisse vel placerat ligula. Vivamus ac sem lacus. Ut vehicula rhoncus elementum. Etiam quis tristique lectus. Aliquam in arcu eget velit pulvinar dictum vel in justo.</p>
+                </div>
+                <div class="col item social"><a href="#"><i class="fa-brands fa-facebook-f"></i></a><a href="#"><i class="fa-brands fa-twitter"></i></a><a href="#"><i class="fa-brands fa-snapchat"></i></a><a href="#"><i class="fa-brands fa-instagram"></i></a></div>
+            </div>
+            <p class="copyright">TK © 2022</p>
+        </div>
+    </footer>
+    <!-- Messenger Plugin chat Code -->
+    <div id="fb-root"></div>
+
+    <!-- Your Plugin chat code -->
+    <div id="fb-customer-chat" class="fb-customerchat">
+    </div>
+
+    <script>
+        var chatbox = document.getElementById('fb-customer-chat');
+        chatbox.setAttribute("page_id", "105449742133587");
+        chatbox.setAttribute("attribution", "biz_inbox");
+    </script>
+
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    <script>
+        $(document).ready(function () {
+            var myHeaders = new Headers();
+            myHeaders.append("apikey", "3ifWih44XjhEP1UyQm7TeHxpwH6y0MKC");
+            
+            var requestOptions = {
+                method: 'GET',
+                redirect: 'follow',
+                headers: myHeaders
+            };
+           
+            fetch("https://api.apilayer.com/currency_data/live?source=usd&currencies=eur%2Cgbp%2Cjpy%2Cvnd", requestOptions)
+                .then(response => response.text())
+                .then((result) => {
+                    result = JSON.parse(result);
+                    let thu = result.quotes;
+                   
+                    $.each(thu, function (key, value) {
+                        var elementapi = $('#api');
+                        var elementP = document.createElement("span");
+                        key = key.substr(3, 6);
+                        elementP.innerText = "1 USD to " + key + ":" + fomatmoney(key,value);
+                     
+                        elementapi.append(elementP);
+                      
+                      
+                    });
+                   
+                    console.log(thu);
+                   
+                }
+                    
+                )
+                .catch(error => console.log('error', error));
+           
+        });
+        $.ajax({
+            url: "@Url.Action("GetCartAmount", "Cart")",
+            success: function (res) {
+                $("#cart-amount").text(res);
+            }
+        })
+        function fomatmoney(key,money) {
+            try {
+                let formatmoney = null;
+                if (key == "VND") {
+                    formatmoney = new Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                    }).format(money);
+                    
+                    return formatmoney;
+                }
+                else if (key == "JPY") {
+                    formatmoney = new Intl.NumberFormat("ja-JP", {
+                        style: "currency",
+                        currency: "JPY",
+                    }).format(money);
+                    
+                    return formatmoney;
+                }
+                else if (key == "GBP") {
+                    formatmoney = new Intl.NumberFormat("en-IN", {
+                        style: "currency",
+                        currency: "GBP",
+                    }).format(money);
+                   
+                    return formatmoney;
+                }
+                else if (key == "EUR") {
+                    formatmoney = new Intl.NumberFormat("de-DE", {
+                        style: "currency",
+                        currency: "EUR",
+                    }).format(money);
+
+                    return formatmoney;
+                }
+
+
+            } catch (error) { }
+        }
+    </script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>
